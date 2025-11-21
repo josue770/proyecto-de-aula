@@ -3,6 +3,7 @@ package com.example.view;
 import com.example.controller.EntradaController;
 import com.example.controller.ValidacionController;
 import com.example.model.Entrada;
+import com.example.util.DatosGlobales;
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,12 +13,13 @@ public class RegistroEntradaView extends JFrame {
     private JComboBox<String> cmbMembresia;
 
     public RegistroEntradaView() {
-        entradaController = new EntradaController();
+        entradaController = DatosGlobales.getEntradaController();
         
         setTitle("Registro de Entrada");
         setSize(450, 400);
         setLocationRelativeTo(null);
         setResizable(false);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BorderLayout());
@@ -100,10 +102,9 @@ public class RegistroEntradaView extends JFrame {
             return;
         }
 
-        if (!ValidacionController.validarId(idStr)) {
-            JOptionPane.showMessageDialog(this, 
-                "ID inválido. Debe tener entre 8 y 10 dígitos.", 
-                "Error", JOptionPane.ERROR_MESSAGE);
+        String errorId = ValidacionController.obtenerErrorId(idStr);
+        if (errorId != null) {
+            JOptionPane.showMessageDialog(this, errorId, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 

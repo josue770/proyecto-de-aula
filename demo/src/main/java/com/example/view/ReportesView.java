@@ -4,6 +4,7 @@ import com.example.controller.ClienteController;
 import com.example.controller.EntrenadorController;
 import com.example.controller.EntradaController;
 import com.example.model.Constantes;
+import com.example.util.DatosGlobales;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -15,9 +16,9 @@ public class ReportesView extends JFrame {
     private JTabbedPane tabbedPane;
 
     public ReportesView() {
-        clienteController = new ClienteController();
-        entrenadorController = new EntrenadorController();
-        entradaController = new EntradaController();
+        clienteController = DatosGlobales.getClienteController();
+        entrenadorController = DatosGlobales.getEntrenadorController();
+        entradaController = DatosGlobales.getEntradaController();
 
         setTitle("Reportes");
         setSize(900, 600);
@@ -158,7 +159,12 @@ public class ReportesView extends JFrame {
             }
         };
 
-        for (String especialidad : new String[]{"Cardio", "Musculación", "Flexibilidad", "Crossfit"}) {
+        java.util.Set<String> especialidadesUnicas = new java.util.HashSet<>();
+        for (com.example.model.Entrenador e : entrenadorController.obtenerTodosEntrenadores()) {
+            especialidadesUnicas.add(e.getEspecialidad());
+        }
+
+        for (String especialidad : especialidadesUnicas) {
             modelo.addRow(new Object[]{especialidad, entrenadorController.obtenerEntrenadorPorEspecialidad(especialidad).size()});
         }
 
@@ -182,7 +188,7 @@ public class ReportesView extends JFrame {
         panel.setBackground(Color.WHITE);
 
         JPanel panelInfo = new JPanel();
-        panelInfo.setLayout(new GridLayout(4, 1, 20, 20));
+        panelInfo.setLayout(new GridLayout(7, 1, 20, 20));
         panelInfo.setBackground(Color.WHITE);
         panelInfo.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
 
@@ -190,21 +196,40 @@ public class ReportesView extends JFrame {
         int ingresoSemanal = clienteController.obtenerClientesPorMembresia(Constantes.MEMBRESIA_SEMANAL).size() * Constantes.PRECIO_SEMANAL;
         int ingresoDiaria = clienteController.obtenerClientesPorMembresia(Constantes.MEMBRESIA_DIARIA).size() * Constantes.PRECIO_DIARIO;
         int ingresoTotal = ingresoMensual + ingresoSemanal + ingresoDiaria;
+        
+        double totalSalarios = entrenadorController.obtenerTotalSalarios();
+        int ingresoNeto = (int) (ingresoTotal - totalSalarios);
 
         JLabel lblIngresoMensual = new JLabel("Ingresos Membresía Mensual: $" + ingresoMensual);
         lblIngresoMensual.setFont(new Font("Arial", Font.BOLD, 14));
+        
         JLabel lblIngresoSemanal = new JLabel("Ingresos Membresía Semanal: $" + ingresoSemanal);
         lblIngresoSemanal.setFont(new Font("Arial", Font.BOLD, 14));
+        
         JLabel lblIngresoDiaria = new JLabel("Ingresos Membresía Diaria: $" + ingresoDiaria);
         lblIngresoDiaria.setFont(new Font("Arial", Font.BOLD, 14));
-        JLabel lblIngresoTotal = new JLabel("Ingreso Total: $" + ingresoTotal);
+        
+        JLabel lblIngresoTotal = new JLabel("Ingreso Total Bruto: $" + ingresoTotal);
         lblIngresoTotal.setFont(new Font("Arial", Font.BOLD, 16));
-        lblIngresoTotal.setForeground(new Color(40, 167, 69));
+        lblIngresoTotal.setForeground(new Color(0, 123, 255));
+        
+        JLabel lblTotalSalarios = new JLabel("Total de Salarios (Egresos): $" + (int)totalSalarios);
+        lblTotalSalarios.setFont(new Font("Arial", Font.BOLD, 14));
+        lblTotalSalarios.setForeground(new Color(220, 53, 69));
+        
+        JLabel lblEspacio = new JLabel("");
+        
+        JLabel lblIngresoNeto = new JLabel("INGRESO NETO REAL: $" + ingresoNeto);
+        lblIngresoNeto.setFont(new Font("Arial", Font.BOLD, 18));
+        lblIngresoNeto.setForeground(new Color(40, 167, 69));
 
         panelInfo.add(lblIngresoMensual);
         panelInfo.add(lblIngresoSemanal);
         panelInfo.add(lblIngresoDiaria);
         panelInfo.add(lblIngresoTotal);
+        panelInfo.add(lblTotalSalarios);
+        panelInfo.add(lblEspacio);
+        panelInfo.add(lblIngresoNeto);
 
         panel.add(panelInfo, BorderLayout.CENTER);
         return panel;

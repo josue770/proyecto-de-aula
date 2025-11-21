@@ -3,6 +3,8 @@ package com.example.view;
 import com.example.controller.ClienteController;
 import com.example.controller.ValidacionController;
 import com.example.model.Cliente;
+import com.example.util.DatosGlobales;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,7 +14,7 @@ public class RegistroClienteView extends JFrame {
     private JComboBox<String> cmbMembresia;
 
     public RegistroClienteView() {
-        clienteController = new ClienteController();
+       clienteController = DatosGlobales.getClienteController();
         
         setTitle("Registro de Clientes");
         setSize(500, 550);

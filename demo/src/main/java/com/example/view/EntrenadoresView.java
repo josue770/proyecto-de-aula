@@ -3,6 +3,7 @@ package com.example.view;
 import com.example.controller.EntrenadorController;
 import com.example.controller.ValidacionController;
 import com.example.model.Entrenador;
+import com.example.util.DatosGlobales;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -14,7 +15,7 @@ public class EntrenadoresView extends JFrame {
     private DefaultTableModel modeloTabla;
 
     public EntrenadoresView() {
-        entrenadorController = new EntrenadorController();
+        entrenadorController = DatosGlobales.getEntrenadorController();
 
         setTitle("Gestión de Entrenadores");
         setSize(900, 650);
@@ -138,7 +139,26 @@ public class EntrenadoresView extends JFrame {
         panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
 
         add(panelPrincipal);
+        
+        cargarEntrenadores();
+        
         setVisible(true);
+    }
+
+    private void cargarEntrenadores() {
+        modeloTabla.setRowCount(0);
+        for (Entrenador entrenador : entrenadorController.obtenerTodosEntrenadores()) {
+            modeloTabla.addRow(new Object[]{
+                entrenador.getId(),
+                entrenador.getNombre(),
+                entrenador.getNumero(),
+                entrenador.getCorreo(),
+                entrenador.getEspecialidad(),
+                "$" + entrenador.getSalario(),
+                entrenador.getFechaContratacion(),
+                entrenador.isActivo() ? "Activo" : "Inactivo"
+            });
+        }
     }
 
     private void agregarEntrenador() {
@@ -150,8 +170,9 @@ public class EntrenadoresView extends JFrame {
         String salarioStr = txtSalario.getText().trim();
         String fechaContratacion = txtFechaContratacion.getText().trim();
 
-        if (!ValidacionController.validarId(idStr)) {
-            JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        String errorId = ValidacionController.obtenerErrorId(idStr);
+        if (errorId != null) {
+            JOptionPane.showMessageDialog(this, errorId, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -190,9 +211,9 @@ public class EntrenadoresView extends JFrame {
         Entrenador nuevoEntrenador = new Entrenador(id, nombre, numero, correo, especialidad, salario, fechaContratacion);
 
         if (entrenadorController.agregarEntrenador(nuevoEntrenador)) {
-            modeloTabla.addRow(new Object[]{id, nombre, numero, correo, especialidad, "$" + salario, fechaContratacion, "Activo"});
             JOptionPane.showMessageDialog(this, "Entrenador agregado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
+            cargarEntrenadores();
         } else {
             JOptionPane.showMessageDialog(this, "Ya existe un entrenador con ese ID.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -213,8 +234,9 @@ public class EntrenadoresView extends JFrame {
         String salarioStr = txtSalario.getText().trim();
         String fechaContratacion = txtFechaContratacion.getText().trim();
 
-        if (!ValidacionController.validarId(idStr)) {
-            JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        String errorId = ValidacionController.obtenerErrorId(idStr);
+        if (errorId != null) {
+            JOptionPane.showMessageDialog(this, errorId, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -253,14 +275,9 @@ public class EntrenadoresView extends JFrame {
         Entrenador entrenadorActualizado = new Entrenador(id, nombre, numero, correo, especialidad, salario, fechaContratacion);
 
         if (entrenadorController.actualizarEntrenador(id, entrenadorActualizado)) {
-            modeloTabla.setValueAt(nombre, filaSeleccionada, 1);
-            modeloTabla.setValueAt(numero, filaSeleccionada, 2);
-            modeloTabla.setValueAt(correo, filaSeleccionada, 3);
-            modeloTabla.setValueAt(especialidad, filaSeleccionada, 4);
-            modeloTabla.setValueAt("$" + salario, filaSeleccionada, 5);
-            modeloTabla.setValueAt(fechaContratacion, filaSeleccionada, 6);
             JOptionPane.showMessageDialog(this, "Entrenador actualizado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
+            cargarEntrenadores();
         } else {
             JOptionPane.showMessageDialog(this, "Error al actualizar el entrenador.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -275,9 +292,9 @@ public class EntrenadoresView extends JFrame {
 
         int id = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
         if (entrenadorController.eliminarEntrenador(id)) {
-            modeloTabla.removeRow(filaSeleccionada);
             JOptionPane.showMessageDialog(this, "Entrenador eliminado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
+            cargarEntrenadores();
         } else {
             JOptionPane.showMessageDialog(this, "Error al eliminar el entrenador.", "Error", JOptionPane.ERROR_MESSAGE);
         }
