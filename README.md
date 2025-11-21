@@ -1,6 +1,6 @@
 # Sistema de Gestión de Gimnasio
 
-![Badge](https://deepwiki.com/badge-maker?url=https%3A%2F%2Fdeepwiki.com%2Fjosue770%2Fproyecto-de-aula)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/josue770/proyecto-de-aula)
 
 ## Descripción
 
